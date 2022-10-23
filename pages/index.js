@@ -125,7 +125,7 @@ function HomePage() {
 
   return (
     <div className="2xl:w-8/12 mx-auto 2xl:mt-20 2xl:rounded-2xl overflow-hidden">
-      <div className="w-full h-64 bg-sky-900 p-8 flex items-center justify-start gap-4">
+      <div className="w-full h-64 bg-sky-900 p-8 flex items-center justify-between gap-4">
         <div className="w-1/12 h-full bg-sky-800 flex flex-col rounded-sm">
           <div className="flex justify-center text-mono text-amber-400">
             OSC
@@ -165,6 +165,7 @@ function HomePage() {
             </div>
           </div>
         </div>
+        <Eye />
         <div className="w-3/12 h-full bg-sky-800 flex flex-col rounded-sm">
           <div className="flex justify-center text-mono text-amber-400">
             ADSR
@@ -224,6 +225,8 @@ function HomePage() {
             </div>
           </div>
         </div>
+        <div className="w-4/12 h-full bg-sky-800 flex flex-col rounded-sm"></div>
+        <Eye />
         <div className="w-1/12 h-full bg-sky-800 flex flex-col rounded-sm">
           <div className="flex justify-center text-mono text-amber-400">
             MASTER
@@ -252,6 +255,16 @@ function HomePage() {
           handleNoteOn={handleNoteOn}
           handleNoteOff={handleNoteOff}
         />
+      </div>
+    </div>
+  );
+}
+
+function Eye() {
+  return (
+    <div className="w-1/12 h-full bg-slate-900 flex flex-col rounded-xl rounded-t-3xl p-2">
+      <div className="w-full h-full ring-8 ring-amber-900 rounded-sm rounded-t-xl flex items-end pb-10 justify-center">
+        <span className="bg-slate-50 w-8 h-12 rounded-lg rounded-t-2xl"></span>
       </div>
     </div>
   );
