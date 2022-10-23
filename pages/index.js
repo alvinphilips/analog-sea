@@ -4,6 +4,8 @@ const noteMap = new Map();
 
 const WAVEFORMS = ["square", "triangle", "sawtooth", "sine"];
 const STAGE_MAX_TIME = 2;
+const ANALYSER_FFT_SIZE = 2048;
+const visualizerData = new Uint8Array(ANALYSER_FFT_SIZE / 2);
 
 function HomePage() {
   const midi = useRef(null);
@@ -11,6 +13,7 @@ function HomePage() {
   const mainGain = useRef(null);
   const adsrNode = useRef(null);
   const compressorNode = useRef(null);
+  const visualizerNode = useRef(null);
   const [volume, setVolume] = useState(0.5);
   const [waveform, setWaveform] = useState(0);
   const [attack, setAttack] = useState(0.0);
@@ -22,10 +25,9 @@ function HomePage() {
     const data = message.data;
     const type = data[0] & 0xf0;
     const note = data[1];
-    const velocity = data[2];
     switch (type) {
       case 144:
-        noteOn(note, velocity);
+        noteOn(note, 127);
         break;
       case 128:
         noteOff(note);
@@ -38,7 +40,7 @@ function HomePage() {
 
     const osc = actx.current.createOscillator();
     osc.frequency.value = 440 * Math.pow(2, (note - 69) / 12);
-    osc.waveform = waveformString.current;
+    osc.type = waveformString.current;
     osc.connect(adsrNode.current);
     osc.start();
     noteMap.set(note, osc);
@@ -91,10 +93,12 @@ function HomePage() {
     actx.current = new AudioContext();
     mainGain.current = actx.current.createGain();
     mainGain.current.connect(actx.current.destination);
+    visualizerNode.current = actx.current.createAnalyser();
     compressorNode.current = actx.current.createDynamicsCompressor();
     compressorNode.current.connect(mainGain.current);
     adsrNode.current = actx.current.createGain();
     adsrNode.current.connect(compressorNode.current);
+    compressorNode.current.connect(visualizerNode.current);
 
     // Get MIDI access
     if (navigator.requestMIDIAccess) {
@@ -123,138 +127,180 @@ function HomePage() {
     console.log(attack, decay, sustain, release);
   }, [attack, decay, sustain, release]);
 
+  useEffect(() => {
+    const canvas = document.getElementById("visualizer");
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+    function render() {
+      visualizerNode.current.getByteTimeDomainData(visualizerData);
+      ctx.clearRect(0, 0, width, height);
+      ctx.beginPath();
+      ctx.strokeStyle = "#f59e0b";
+      const bufferLength = visualizerData.length;
+      const sliceWidth = width / bufferLength;
+      let x = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const v = visualizerData[i] / 128.0;
+        const y = v * (height / 2);
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+        x += sliceWidth;
+      }
+      ctx.lineTo(width, height / 2);
+      ctx.stroke();
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+  }, []);
+
   return (
-    <div className="2xl:w-8/12 mx-auto 2xl:mt-20 2xl:rounded-2xl overflow-hidden">
-      <div className="w-full h-64 bg-sky-900 p-8 flex items-center justify-between gap-4">
-        <div className="w-1/12 h-full bg-sky-800 flex flex-col rounded-sm">
-          <div className="flex justify-center text-mono text-amber-400">
-            OSC
-          </div>
-          <div className="flex flex-col h-full">
-            <div
-              onClick={() => setWaveform(0)}
-              className={`font-mono text-slate-50 ${
-                waveform === 0 ? "bg-sky-600" : "bg-sky-900"
-              } h-full m-1 mb-0 flex justify-center items-center`}
-            >
-              SQR
+    <div className="w-screen h-screen bg-slate-800 m-0 2xl:pt-20 ">
+      <div className="2xl:w-8/12 mx-auto 2xl:rounded-2xl overflow-hidden select-none">
+        <div className="w-full h-64 bg-sky-900 p-8 flex items-center justify-between gap-4">
+          <div className="w-1/12 h-full bg-sky-800 flex flex-col rounded-sm">
+            <div className="flex justify-center text-mono text-amber-400">
+              OSC
             </div>
-            <div
-              onClick={() => setWaveform(1)}
-              className={`font-mono text-slate-50 ${
-                waveform === 1 ? "bg-sky-600" : "bg-sky-900"
-              } h-full m-1 mb-0 flex justify-center items-center`}
-            >
-              TRI
-            </div>
-            <div
-              onClick={() => setWaveform(2)}
-              className={`font-mono text-slate-50 ${
-                waveform === 2 ? "bg-sky-600" : "bg-sky-900"
-              } h-full m-1 mb-0 flex justify-center items-center`}
-            >
-              SAW
-            </div>
-            <div
-              onClick={() => setWaveform(3)}
-              className={`font-mono text-slate-50 ${
-                waveform === 3 ? "bg-sky-600" : "bg-sky-900"
-              } h-full m-1 flex justify-center items-center`}
-            >
-              SINE
-            </div>
-          </div>
-        </div>
-        <Eye />
-        <div className="w-3/12 h-full bg-sky-800 flex flex-col rounded-sm">
-          <div className="flex justify-center text-mono text-amber-400">
-            ADSR
-          </div>
-          <div className="flex w-full h-full">
-            <div className="flex flex-col h-full w-1/2">
-              <div className="font-mono text-slate-50 h-full m-1 mb-0 flex justify-center items-center">
-                ATTACK
+            <div className="flex flex-col h-full">
+              <div
+                onClick={() => setWaveform(0)}
+                className={`font-mono text-slate-50 ${
+                  waveform === 0 ? "bg-sky-600" : "bg-sky-900"
+                } h-full m-1 mb-0 flex justify-center items-center`}
+              >
+                SQR
               </div>
-              <div className="font-mono text-slate-50 h-full m-1 mb-0 flex justify-center items-center">
-                DECAY
+              <div
+                onClick={() => setWaveform(1)}
+                className={`font-mono text-slate-50 ${
+                  waveform === 1 ? "bg-sky-600" : "bg-sky-900"
+                } h-full m-1 mb-0 flex justify-center items-center`}
+              >
+                TRI
               </div>
-              <div className="font-mono text-slate-50 h-full m-1 mb-0 flex justify-center items-center">
-                SUSTAIN
+              <div
+                onClick={() => setWaveform(2)}
+                className={`font-mono text-slate-50 ${
+                  waveform === 2 ? "bg-sky-600" : "bg-sky-900"
+                } h-full m-1 mb-0 flex justify-center items-center`}
+              >
+                SAW
               </div>
-              <div className="font-mono text-slate-50 h-full m-1 flex justify-center items-center">
-                RELEASE
+              <div
+                onClick={() => setWaveform(3)}
+                className={`font-mono text-slate-50 ${
+                  waveform === 3 ? "bg-sky-600" : "bg-sky-900"
+                } h-full m-1 flex justify-center items-center`}
+              >
+                SINE
               </div>
             </div>
-            <div className="flex flex-col w-full h-full">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                defaultValue="0"
-                onChange={(e) => setAttack(e.target.value)}
-                className="font-mono text-slate-50 accent-amber-500 h-full m-1 mb-0 flex justify-center items-center"
-              />
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                defaultValue="0"
-                onChange={(e) => setdecay(e.target.value)}
-                className="font-mono text-slate-50 accent-amber-500 h-full m-1 mb-0 flex justify-center items-center"
-              />
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                defaultValue="1"
-                onChange={(e) => setSustain(e.target.value)}
-                className="font-mono text-slate-50 accent-amber-500 h-full m-1 mb-0 flex justify-center items-center"
-              />
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                defaultValue="0"
-                onChange={(e) => setRelease(e.target.value)}
-                className="font-mono text-slate-50 accent-amber-500 h-full m-1 flex justify-center items-center"
-              />
+          </div>
+          <Eye />
+          <div className="w-3/12 h-full bg-sky-800 flex flex-col rounded-sm">
+            <div className="flex justify-center text-mono text-amber-400">
+              ADSR
+            </div>
+            <div className="flex w-full h-full">
+              <div className="flex flex-col h-full w-1/2">
+                <div className="font-mono text-slate-50 h-full m-1 mb-0 flex justify-center items-center">
+                  ATTACK
+                </div>
+                <div className="font-mono text-slate-50 h-full m-1 mb-0 flex justify-center items-center">
+                  DECAY
+                </div>
+                <div className="font-mono text-slate-50 h-full m-1 mb-0 flex justify-center items-center">
+                  SUSTAIN
+                </div>
+                <div className="font-mono text-slate-50 h-full m-1 flex justify-center items-center">
+                  RELEASE
+                </div>
+              </div>
+              <div className="flex flex-col w-full h-full">
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  defaultValue="0"
+                  onChange={(e) => setAttack(e.target.value)}
+                  className="font-mono text-slate-50 accent-amber-500 h-full m-1 mb-0 flex justify-center items-center"
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  defaultValue="0"
+                  onChange={(e) => setdecay(e.target.value)}
+                  className="font-mono text-slate-50 accent-amber-500 h-full m-1 mb-0 flex justify-center items-center"
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  defaultValue="1"
+                  onChange={(e) => setSustain(e.target.value)}
+                  className="font-mono text-slate-50 accent-amber-500 h-full m-1 mb-0 flex justify-center items-center"
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  defaultValue="0"
+                  onChange={(e) => setRelease(e.target.value)}
+                  className="font-mono text-slate-50 accent-amber-500 h-full m-1 flex justify-center items-center"
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="w-4/12 h-full bg-sky-800 flex flex-col rounded-sm"></div>
-        <Eye />
-        <div className="w-1/12 h-full bg-sky-800 flex flex-col rounded-sm">
-          <div className="flex justify-center text-mono text-amber-400">
-            MASTER
-          </div>
-          <div className="flex flex-col h-full">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.05"
-              defaultValue="0.5"
-              onChange={(e) => setVolume(e.target.value)}
-              className="font-mono text-slate-50 accent-amber-500 h-full flex justify-center items-center -rotate-90"
+          <div className="w-4/12 h-full bg-sky-800 flex flex-col rounded-sm pb-4 px-2">
+            <div className="flex justify-center text-mono text-amber-400 pb-4">
+              ANALYSER
+            </div>
+            <canvas
+              id="visualizer"
+              className="w-full h-full"
+              width="500"
+              height="100%"
             />
           </div>
+          <Eye />
+          <div className="w-1/12 h-full bg-sky-800 flex flex-col rounded-sm">
+            <div className="flex justify-center text-mono text-amber-400">
+              MASTER
+            </div>
+            <div className="flex flex-col h-full">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                defaultValue="0.5"
+                onChange={(e) => setVolume(e.target.value)}
+                className="font-mono text-slate-50 accent-amber-500 h-full flex justify-center items-center -rotate-90"
+              />
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="flex h-64 w-full select-none justify-center bg-sky-600 pb-8">
-        <Octave
-          octave={4}
-          handleNoteOn={handleNoteOn}
-          handleNoteOff={handleNoteOff}
-        />
-        <Octave
-          octave={5}
-          handleNoteOn={handleNoteOn}
-          handleNoteOff={handleNoteOff}
-        />
+        <div className="flex h-64 w-full justify-center bg-sky-600 pb-8">
+          <Octave
+            octave={4}
+            handleNoteOn={handleNoteOn}
+            handleNoteOff={handleNoteOff}
+          />
+          <Octave
+            octave={5}
+            handleNoteOn={handleNoteOn}
+            handleNoteOff={handleNoteOff}
+          />
+        </div>
       </div>
     </div>
   );
