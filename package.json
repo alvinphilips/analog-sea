@@ -1,0 +1,24 @@
+{
+  "name": "analog-sea",
+  "version": "1.0.0",
+  "description": "A sea themed synth",
+  "repository": "https://github.com/polarvoid/analog-sea",
+  "author": "Alvin Philips <alvinphilips257@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.12",
+    "postcss": "^8.4.18",
+    "tailwindcss": "^3.2.1"
+  },
+  "dependencies": {
+    "next": "^12.3.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
