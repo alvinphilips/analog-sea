@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 700 700" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-266,-112)">
+<svg width="100%" height="100%" viewBox="0 0 620 620" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-306,-152)">
         <path d="M924.461,238.882C924.461,224.944 913.145,213.627 899.207,213.627L332.793,213.627C318.855,213.627 307.539,224.944 307.539,238.882L307.539,693.46C307.539,707.398 318.855,718.714 332.793,718.714L899.207,718.714C913.145,718.714 924.461,707.398 924.461,693.46L924.461,238.882Z" style="fill:rgb(2,132,199);"/>
         <g transform="matrix(1,0,0,1,97.6394,138.994)">
-            <g transform="matrix(1,-0,-0,1,168.361,-26.9938)">
-                <use xlink:href="#_Image1" x="104.902" y="349" width="491px" height="225px"/>
+            <g transform="matrix(1,-0,-0,1,208.361,13.0062)">
+                <use xlink:href="#_Image1" x="64.902" y="309" width="491px" height="225px"/>
             </g>
         </g>
         <path d="M307.539,502.573L924.461,471.452L924.461,238.882C924.461,224.944 913.145,213.627 899.207,213.627L332.793,213.627C318.855,213.627 307.539,224.944 307.539,238.882L307.539,502.573Z" style="fill:rgb(12,74,110);"/>
         <g id="Eye" transform="matrix(1,0,0,1,244.967,163.483)">
-            <g transform="matrix(1,-0,-0,1,21.033,-51.4833)">
-                <use xlink:href="#_Image2" x="153.971" y="150.849" width="89px" height="191px"/>
+            <g transform="matrix(1,-0,-0,1,61.033,-11.4833)">
+                <use xlink:href="#_Image2" x="113.971" y="110.849" width="89px" height="191px"/>
             </g>
             <g transform="matrix(1,0,0,1,-1.40901,1.04459)">
                 <path d="M243.67,208.454C243.67,200.241 237.002,193.572 228.788,193.572L225.481,193.572C217.268,193.572 210.599,200.241 210.599,208.454L210.599,234.219C210.599,238.782 214.304,242.487 218.867,242.487L235.403,242.487C239.966,242.487 243.67,238.782 243.67,234.219L243.67,208.454Z" style="fill:rgb(248,250,252);"/>
             </g>
         </g>
         <g id="Eye1" serif:id="Eye" transform="matrix(1,0,0,1,542.125,163.483)">
-            <g transform="matrix(1,-0,-0,1,-276.125,-51.4833)">
-                <use xlink:href="#_Image2" x="457.673" y="150.849" width="89px" height="191px"/>
+            <g transform="matrix(1,-0,-0,1,-236.125,-11.4833)">
+                <use xlink:href="#_Image2" x="417.673" y="110.849" width="89px" height="191px"/>
             </g>
             <g transform="matrix(1,0,0,1,-1.40901,1.04459)">
                 <path d="M243.67,208.454C243.67,200.241 237.002,193.572 228.788,193.572L225.481,193.572C217.268,193.572 210.599,200.241 210.599,208.454L210.599,234.219C210.599,238.782 214.304,242.487 218.867,242.487L235.403,242.487C239.966,242.487 243.67,238.782 243.67,234.219L243.67,208.454Z" style="fill:rgb(248,250,252);"/>
