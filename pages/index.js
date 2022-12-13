@@ -28,7 +28,7 @@ function HomePage() {
     const note = data[1];
     switch (type) {
       case 144:
-        noteOn(note, 127);
+        handleNoteOn(note)();
         break;
       case 128:
         noteOff(note);
@@ -162,6 +162,8 @@ function HomePage() {
     <>
       <Head>
         <title>Analog Sea</title>
+        <link rel="icon" href="/icon.png" type="image/png"/>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
       </Head>
       <div className="w-screen h-screen bg-slate-800 m-0 2xl:pt-20 ">
         <div className="2xl:w-8/12 mx-auto 2xl:rounded-2xl overflow-hidden select-none">
